@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.maison-lumiere.fr/</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.maison-lumiere.fr/images/hero.jpg</image:loc>
+      <image:title>Mariage dans les vignes en Provence à l'heure dorée — Maison Lumière</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.maison-lumiere.fr/images/vineyard.jpg</image:loc>
+      <image:title>Cérémonie de mariage en plein air entre les vignes, Provence</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.maison-lumiere.fr/images/portrait.jpg</image:loc>
+      <image:title>Camille Aubert, photographe principale — Maison Lumière</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.maison-lumiere.fr/livre-dor.html</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

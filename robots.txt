@@ -1,0 +1,23 @@
+# Maison Lumière — https://www.maison-lumiere.fr
+# Tous les robots sont les bienvenus, y compris les moteurs de réponse IA (GEO).
+
+User-agent: *
+Allow: /
+
+# Robots IA explicitement autorisés
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://www.maison-lumiere.fr/sitemap.xml
