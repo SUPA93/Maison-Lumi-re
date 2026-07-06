@@ -114,6 +114,14 @@ a { color: inherit; }
   transition: background .3s, box-shadow .3s, backdrop-filter .3s;
   color: var(--cream);
 }
+.nav::before {
+  /* Dégradé discret derrière la nav tant qu'on n'a pas scrollé : sans lui, le texte
+     crème est illisible sur les photos hero claires (ex. feu d'artifice). Contenu
+     strictement dans la hauteur de la nav, pas d'extension sous la barre. */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, oklch(15% 0.02 55 / .4) 0%, oklch(15% 0.02 55 / .08) 100%);
+}
+.nav.is-scrolled::before { display: none; }
 .nav.is-scrolled {
   background: oklch(97% 0.014 75 / .9); backdrop-filter: blur(12px);
   box-shadow: 0 1px 0 var(--line); color: var(--ink);
