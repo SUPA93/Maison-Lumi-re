@@ -133,8 +133,53 @@
         tile.classList.toggle('is-hidden', !show);
         if (show) tile.classList.add('is-in');
       });
+      resetSpotlight();
     });
   });
+
+  /* ---- Galerie : spotlight auto (met en avant une photo à la fois) ---- */
+  const gallery = $('#gallery');
+  let spotTimer = null, resetSpotlight = () => {};
+  if (gallery && tiles.length && !reduceMotion) {
+    let spotIndex = 0;
+    const setSpotlight = () => {
+      const visible = tiles.filter((t) => !t.classList.contains('is-hidden'));
+      if (!visible.length) return;
+      tiles.forEach((t) => {
+        t.classList.remove('is-spotlight');
+        t.style.setProperty('--fly-x', '0px');
+        t.style.setProperty('--fly-y', '0px');
+        t.style.setProperty('--fly-scale', '1');
+      });
+      if (visible.length < 2) return;
+      spotIndex = ((spotIndex % visible.length) + visible.length) % visible.length;
+      const active = visible[spotIndex];
+      const rect = active.getBoundingClientRect();
+      const dx = window.innerWidth / 2 - (rect.left + rect.width / 2);
+      const dy = window.innerHeight / 2 - (rect.top + rect.height / 2);
+      active.style.setProperty('--fly-x', `${dx}px`);
+      active.style.setProperty('--fly-y', `${dy}px`);
+      active.style.setProperty('--fly-scale', '1.2');
+      active.classList.add('is-spotlight');
+    };
+    const startSpotlight = () => {
+      clearInterval(spotTimer);
+      spotTimer = setInterval(() => { spotIndex += 1; setSpotlight(); }, 4500);
+    };
+    resetSpotlight = () => { spotIndex = 0; setSpotlight(); startSpotlight(); };
+    const galleryIO = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        galleryIO.unobserve(en.target);
+        gallery.classList.add('is-spotlighting');
+        setSpotlight();
+        startSpotlight();
+      });
+    }, { threshold: 0.2 });
+    galleryIO.observe(gallery);
+    gallery.addEventListener('mouseenter', () => clearInterval(spotTimer));
+    gallery.addEventListener('mouseleave', startSpotlight);
+  }
 
   /* ---- Lightbox ---- */
   const lightbox = $('#lightbox');
