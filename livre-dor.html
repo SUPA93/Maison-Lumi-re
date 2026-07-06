@@ -28,7 +28,16 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtKky2F7g.woff2">
+  <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional"
+        media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional"></noscript>
   <link rel="stylesheet" href="css/styles.css">
 
   <script type="application/ld+json">
@@ -148,7 +157,10 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a class="nav__brand" href="index.html" aria-label="Maison Lumière — accueil">
-        <img src="images/logo-384.png" alt="" width="46" height="45">
+        <picture>
+          <source type="image/webp" srcset="images/logo-320.webp">
+          <img src="images/logo-320.png" alt="" width="46" height="45">
+        </picture>
         <span>MAISON LUMIÈRE</span>
       </a>
       <nav class="nav__links" id="navLinks" aria-label="Navigation principale">
@@ -276,7 +288,7 @@
 
   <footer class="footer">
     <div class="footer__inner">
-      <span class="footer__brand"><img src="images/logo-384.png" alt="" width="34" height="33"> MAISON LUMIÈRE</span>
+      <span class="footer__brand"><picture><source type="image/webp" srcset="images/logo-320.webp"><img src="images/logo-320.png" alt="" width="34" height="33"></picture> MAISON LUMIÈRE</span>
       <span class="footer__copy">© 2026 Maison Lumière — Photographe de mariages &amp; d'événements en Provence. Tous droits réservés. Site réalisé par <a href="https://www.create-me.fr" target="_blank" rel="noopener">Cre@teME</a>.</span>
       <nav aria-label="Pied de page">
         <a href="index.html#work">Portfolio</a>

@@ -37,13 +37,28 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="apple-touch-icon" href="images/logo-384.png">
 
-  <!-- Polices -->
+  <!-- Polices : préchargement direct des fichiers utilisés au-dessus de la ligne de flottaison
+       (évite l'aller-retour CSS Google Fonts -> woff2, réduit le décalage de mise en page au swap) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtKky2F7g.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="https://fonts.gstatic.com/s/cormorantgaramond/v21/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEtImSqn7B6D.woff2">
+  <!-- Feuille Google Fonts chargée en asynchrone (non bloquante pour le rendu) -->
+  <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional"
+        media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=optional"></noscript>
 
   <!-- Performance -->
-  <link rel="preload" as="image" href="images/hero.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="images/hero.webp" fetchpriority="high" type="image/webp"
+        imagesrcset="images/hero-640w.webp 640w, images/hero-1080w.webp 1080w, images/hero.webp 1376w"
+        imagesizes="100vw">
   <link rel="stylesheet" href="css/styles.css">
 
   <!-- Données structurées : LocalBusiness + Personne + Offres + FAQ + Avis -->
@@ -166,7 +181,10 @@
 
   <div class="preloader" id="preloader" aria-hidden="true">
     <div class="preloader__inner">
-      <img class="preloader__logo" src="images/logo-384.png" alt="" width="384" height="375">
+      <picture>
+        <source type="image/webp" srcset="images/logo-320.webp">
+        <img class="preloader__logo" src="images/logo-320.png" alt="" width="320" height="312">
+      </picture>
       <div class="preloader__mark">Maison <span>Lumière</span></div>
     </div>
   </div>
@@ -179,7 +197,10 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a class="nav__brand" href="#top" aria-label="Maison Lumière — accueil">
-        <img src="images/logo-384.png" alt="" width="46" height="45">
+        <picture>
+          <source type="image/webp" srcset="images/logo-320.webp">
+          <img src="images/logo-320.png" alt="" width="46" height="45">
+        </picture>
         <span>MAISON LUMIÈRE</span>
       </a>
       <nav class="nav__links" id="navLinks" aria-label="Navigation principale">
@@ -202,8 +223,22 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
       <div class="hero__media" id="heroMedia">
-        <img src="images/hero.jpg" width="1376" height="768" fetchpriority="high"
-             alt="Mariés à l'heure dorée lors d'un mariage dans les vignes en Provence, photographiés par Maison Lumière">
+        <picture>
+          <source type="image/webp" sizes="100vw"
+                  srcset="images/hero-640w.webp 640w, images/hero-1080w.webp 1080w, images/hero.webp 1376w">
+          <img class="hero__slide is-active" src="images/hero.jpg" width="1376" height="768" fetchpriority="high"
+               srcset="images/hero-640w.jpg 640w, images/hero-1080w.jpg 1080w, images/hero.jpg 1376w"
+               sizes="100vw"
+               alt="Mariés à l'heure dorée lors d'un mariage dans les vignes en Provence, photographiés par Maison Lumière">
+        </picture>
+        <picture>
+          <source type="image/webp" sizes="100vw"
+                  srcset="images/FeuDartifice-640w.webp 640w, images/FeuDartifice-1080w.webp 1080w, images/FeuDartifice-1600w.webp 1600w, images/FeuDartifice.webp 1672w">
+          <img class="hero__slide" src="images/FeuDartifice.jpg" width="1672" height="941" loading="lazy"
+               srcset="images/FeuDartifice-640w.jpg 640w, images/FeuDartifice-1080w.jpg 1080w, images/FeuDartifice-1600w.jpg 1600w, images/FeuDartifice.jpg 1672w"
+               sizes="100vw"
+               alt="Jeunes mariés enlacés admirant un feu d'artifice au-dessus de leur réception de mariage">
+        </picture>
       </div>
       <div class="hero__content">
         <p class="eyebrow reveal">Photographie de mariages &amp; d'événements — Provence, France</p>
@@ -251,51 +286,133 @@
       <div class="gallery" id="gallery">
         <figure class="tile tile--big reveal" data-cat="weddings">
           <button class="tile__zoom" data-lightbox="images/vineyard.jpg" aria-label="Agrandir : cérémonie dans les vignes en Provence">
-            <img src="images/vineyard.jpg" width="1200" height="896" loading="lazy" alt="Cérémonie de mariage en plein air entre les rangs de vignes en Provence au coucher du soleil">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                      srcset="images/vineyard-480w.webp 480w, images/vineyard-800w.webp 800w, images/vineyard.webp 1200w">
+              <img src="images/vineyard.jpg" width="1200" height="896" loading="lazy"
+                   srcset="images/vineyard-480w.jpg 480w, images/vineyard-800w.jpg 800w, images/vineyard.jpg 1200w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                   alt="Cérémonie de mariage en plein air entre les rangs de vignes en Provence au coucher du soleil">
+            </picture>
           </button>
           <figcaption><strong>Cérémonie dans les vignes</strong><span>Mariages — Provence</span></figcaption>
         </figure>
         <figure class="tile reveal" data-cat="events">
           <button class="tile__zoom" data-lightbox="images/BabyReveal.jpg" aria-label="Agrandir : gender reveal en extérieur">
-            <img src="images/BabyReveal.jpg" width="1200" height="800" loading="lazy" alt="Décoration raffinée et ballons pour une fête de révélation du genre de bébé en extérieur">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/BabyReveal-480w.webp 480w, images/BabyReveal-800w.webp 800w, images/BabyReveal-1200w.webp 1200w, images/BabyReveal.webp 1408w">
+              <img src="images/BabyReveal.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/BabyReveal-480w.jpg 480w, images/BabyReveal-800w.jpg 800w, images/BabyReveal-1200w.jpg 1200w, images/BabyReveal.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Décoration raffinée et ballons pour une fête de révélation du genre de bébé en extérieur">
+            </picture>
           </button>
           <figcaption><strong>Gender reveal</strong><span>Événements — Provence</span></figcaption>
         </figure>
         <figure class="tile reveal" data-cat="corporate">
           <button class="tile__zoom" data-lightbox="images/GalaEntreprise.jpg" aria-label="Agrandir : gala d'entreprise">
-            <img src="images/GalaEntreprise.jpg" width="1200" height="800" loading="lazy" alt="Grande salle de gala d'entreprise élégamment décorée et éclairée pour une réception, photographiée par Maison Lumière">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/GalaEntreprise-480w.webp 480w, images/GalaEntreprise-800w.webp 800w, images/GalaEntreprise-1200w.webp 1200w, images/GalaEntreprise.webp 1408w">
+              <img src="images/GalaEntreprise.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/GalaEntreprise-480w.jpg 480w, images/GalaEntreprise-800w.jpg 800w, images/GalaEntreprise-1200w.jpg 1200w, images/GalaEntreprise.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Grande salle de gala d'entreprise élégamment décorée et éclairée pour une réception, photographiée par Maison Lumière">
+            </picture>
           </button>
           <figcaption><strong>Gala annuel</strong><span>Entreprise — Paris</span></figcaption>
         </figure>
         <figure class="tile tile--tall reveal" data-cat="events">
           <button class="tile__zoom" data-lightbox="images/Bapteme.jpg" aria-label="Agrandir : photographie de baptême">
-            <img src="images/Bapteme.jpg" width="928" height="1152" loading="lazy" alt="Photographie émouvante d'un baptême intime en Provence">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/Bapteme-480w.webp 480w, images/Bapteme-800w.webp 800w, images/Bapteme.webp 928w">
+              <img src="images/Bapteme.jpg" width="928" height="1152" loading="lazy"
+                   srcset="images/Bapteme-480w.jpg 480w, images/Bapteme-800w.jpg 800w, images/Bapteme.jpg 928w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Photographie émouvante d'un baptême intime en Provence">
+            </picture>
           </button>
           <figcaption><strong>Le baptême</strong><span>Événements — Gordes</span></figcaption>
         </figure>
         <figure class="tile reveal" data-cat="weddings">
           <button class="tile__zoom" data-lightbox="images/MariesPortail.jpg" aria-label="Agrandir : les mariés devant le portail">
-            <img src="images/MariesPortail.jpg" width="1200" height="800" loading="lazy" alt="Jeunes mariés posant avec élégance devant le portail d'un domaine provençal en pierre">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/MariesPortail-480w.webp 480w, images/MariesPortail-800w.webp 800w, images/MariesPortail-1200w.webp 1200w, images/MariesPortail.webp 1408w">
+              <img src="images/MariesPortail.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/MariesPortail-480w.jpg 480w, images/MariesPortail-800w.jpg 800w, images/MariesPortail-1200w.jpg 1200w, images/MariesPortail.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Jeunes mariés posant avec élégance devant le portail d'un domaine provençal en pierre">
+            </picture>
           </button>
           <figcaption><strong>Sous le portail</strong><span>Mariages — Château</span></figcaption>
         </figure>
         <figure class="tile reveal" data-cat="events">
           <button class="tile__zoom" data-lightbox="images/BabyShower.jpg" aria-label="Agrandir : baby shower sous les oliviers">
-            <img src="images/BabyShower.jpg" width="1200" height="800" loading="lazy" alt="Détails de décoration et de douceurs pour une baby shower sous les oliviers">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/BabyShower-480w.webp 480w, images/BabyShower-800w.webp 800w, images/BabyShower-1200w.webp 1200w, images/BabyShower.webp 1408w">
+              <img src="images/BabyShower.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/BabyShower-480w.jpg 480w, images/BabyShower-800w.jpg 800w, images/BabyShower-1200w.jpg 1200w, images/BabyShower.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Détails de décoration et de douceurs pour une baby shower sous les oliviers">
+            </picture>
           </button>
           <figcaption><strong>Baby shower</strong><span>Événements — Aix-en-Provence</span></figcaption>
         </figure>
         <figure class="tile tile--wide reveal" data-cat="events">
           <button class="tile__zoom" data-lightbox="images/Poolparty.jpg" aria-label="Agrandir : pool party de célébration">
-            <img src="images/Poolparty.jpg" width="1200" height="800" loading="lazy" alt="Invités profitant d'une pool party chic au bord d'une piscine d'un domaine en Provence à l'heure dorée">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                      srcset="images/Poolparty-480w.webp 480w, images/Poolparty-800w.webp 800w, images/Poolparty-1200w.webp 1200w, images/Poolparty.webp 1408w">
+              <img src="images/Poolparty.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/Poolparty-480w.jpg 480w, images/Poolparty-800w.jpg 800w, images/Poolparty-1200w.jpg 1200w, images/Poolparty.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                   alt="Invités profitant d'une pool party chic au bord d'une piscine d'un domaine en Provence à l'heure dorée">
+            </picture>
           </button>
           <figcaption><strong>Pool party festive</strong><span>Événements — Saint-Tropez</span></figcaption>
         </figure>
         <figure class="tile reveal" data-cat="weddings">
           <button class="tile__zoom" data-lightbox="images/DanseMariage.jpg" aria-label="Agrandir : première danse sous les guirlandes">
-            <img src="images/DanseMariage.jpg" width="1200" height="800" loading="lazy" alt="Première danse des mariés entourés de leurs invités sous les guirlandes lumineuses">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/DanseMariage-480w.webp 480w, images/DanseMariage-800w.webp 800w, images/DanseMariage-1200w.webp 1200w, images/DanseMariage.webp 1408w">
+              <img src="images/DanseMariage.jpg" width="1408" height="768" loading="lazy"
+                   srcset="images/DanseMariage-480w.jpg 480w, images/DanseMariage-800w.jpg 800w, images/DanseMariage-1200w.jpg 1200w, images/DanseMariage.jpg 1408w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Première danse des mariés entourés de leurs invités sous les guirlandes lumineuses">
+            </picture>
           </button>
           <figcaption><strong>Première danse</strong><span>Mariages — Toscane</span></figcaption>
+        </figure>
+        <figure class="tile tile--wide reveal" data-cat="weddings">
+          <button class="tile__zoom" data-lightbox="images/Parents.jpg" aria-label="Agrandir : les parents émus pendant la cérémonie">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                      srcset="images/Parents-480w.webp 480w, images/Parents-800w.webp 800w, images/Parents-1200w.webp 1200w, images/Parents.webp 1600w">
+              <img src="images/Parents.jpg" width="1600" height="900" loading="lazy"
+                   srcset="images/Parents-480w.jpg 480w, images/Parents-800w.jpg 800w, images/Parents-1200w.jpg 1200w, images/Parents.jpg 1600w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 100vw, (max-width: 1024px) 64vw, 48vw"
+                   alt="Les parents des mariés émus aux larmes pendant la cérémonie, les mariés en arrière-plan">
+            </picture>
+          </button>
+          <figcaption><strong>Les parents émus</strong><span>Mariages — Provence</span></figcaption>
+        </figure>
+        <figure class="tile reveal" data-cat="weddings">
+          <button class="tile__zoom" data-lightbox="images/LaFete.jpg" aria-label="Agrandir : enfants d'honneur courant pendant la réception">
+            <picture>
+              <source type="image/webp" sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                      srcset="images/LaFete-480w.webp 480w, images/LaFete-800w.webp 800w, images/LaFete-1200w.webp 1200w, images/LaFete.webp 1600w">
+              <img src="images/LaFete.jpg" width="1600" height="900" loading="lazy"
+                   srcset="images/LaFete-480w.jpg 480w, images/LaFete-800w.jpg 800w, images/LaFete-1200w.jpg 1200w, images/LaFete.jpg 1600w"
+                   sizes="(max-width: 460px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 32vw, 24vw"
+                   alt="Enfants d'honneur courant en riant sur la piste entre les invités lors d'une réception de mariage en plein air">
+            </picture>
+          </button>
+          <figcaption><strong>La fête bat son plein</strong><span>Mariages — Uzès</span></figcaption>
         </figure>
       </div>
     </section>
@@ -304,7 +421,14 @@
     <section class="about section--dark" id="about">
       <div class="about__grid">
         <div class="about__media reveal">
-          <img src="images/portrait.jpg" width="928" height="1152" loading="lazy" alt="Camille Aubert, photographe principale et fondatrice de Maison Lumière, en Provence">
+          <picture>
+            <source type="image/webp" sizes="(max-width: 900px) 440px, 500px"
+                    srcset="images/portrait-480w.webp 480w, images/portrait-800w.webp 800w, images/portrait.webp 928w">
+            <img src="images/portrait.jpg" width="928" height="1152" loading="lazy"
+                 srcset="images/portrait-480w.jpg 480w, images/portrait-800w.jpg 800w, images/portrait.jpg 928w"
+                 sizes="(max-width: 900px) 440px, 500px"
+                 alt="Camille Aubert, photographe principale et fondatrice de Maison Lumière, en Provence">
+          </picture>
         </div>
         <div class="about__text">
           <p class="eyebrow reveal">Le studio</p>
@@ -378,19 +502,19 @@
           <p>«&nbsp;Camille n'a pas seulement photographié notre mariage, elle a capturé ce qu'il nous a fait ressentir. Nous pleurons devant notre album à chaque anniversaire.&nbsp;»</p>
           <footer><strong>Élise &amp; Marc</strong><span>Mariage dans les vignes, Luberon</span></footer>
         </blockquote>
-        <blockquote class="t-slide">
+        <blockquote class="t-slide" aria-hidden="true">
           <p>«&nbsp;Professionnelle, discrète, et des images finales dignes d'un magazine pour notre gala.&nbsp;»</p>
           <footer><strong>Groupe Vermeil</strong><span>Gala d'entreprise, Paris</span></footer>
         </blockquote>
-        <blockquote class="t-slide">
+        <blockquote class="t-slide" aria-hidden="true">
           <p>«&nbsp;Trois jours de joyeux chaos à Tulum, et pourtant chaque photo respire le calme et la beauté. Chaque centime en valait la peine.&nbsp;»</p>
           <footer><strong>Priya &amp; Dev</strong><span>Mariage destination, Tulum</span></footer>
         </blockquote>
       </div>
-      <div class="t-dots" id="tDots" role="tablist" aria-label="Choisir un témoignage">
-        <button class="is-active" aria-label="Témoignage 1"></button>
-        <button aria-label="Témoignage 2"></button>
-        <button aria-label="Témoignage 3"></button>
+      <div class="t-dots" id="tDots" role="group" aria-label="Choisir un témoignage">
+        <button class="is-active" aria-pressed="true" aria-label="Témoignage 1"></button>
+        <button aria-pressed="false" aria-label="Témoignage 2"></button>
+        <button aria-pressed="false" aria-label="Témoignage 3"></button>
       </div>
       <p class="testimonials__more reveal"><a class="link-arrow" href="livre-dor.html">Parcourir le livre d'or complet →</a></p>
     </section>
@@ -511,7 +635,7 @@
 
   <footer class="footer">
     <div class="footer__inner">
-      <span class="footer__brand"><img src="images/logo-384.png" alt="" width="34" height="33"> MAISON LUMIÈRE</span>
+      <span class="footer__brand"><picture><source type="image/webp" srcset="images/logo-320.webp"><img src="images/logo-320.png" alt="" width="34" height="33"></picture> MAISON LUMIÈRE</span>
       <span class="footer__copy">© 2026 Maison Lumière — Photographe de mariages &amp; d'événements en Provence. Tous droits réservés. Site réalisé par <a href="https://www.create-me.fr" target="_blank" rel="noopener">Cre@teME</a>.</span>
       <nav aria-label="Pied de page">
         <a href="#work">Portfolio</a>

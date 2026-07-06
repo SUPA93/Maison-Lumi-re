@@ -49,6 +49,16 @@
     requestAnimationFrame(() => requestAnimationFrame(() => heroTitle.classList.add('is-in')));
   }
 
+  /* ---- Hero : carrousel crossfade du fond ---- */
+  const heroSlides = $$('.hero__slide');
+  if (heroSlides.length > 1 && !reduceMotion) {
+    let heroIndex = 0;
+    setInterval(() => {
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      heroSlides.forEach((s, i) => s.classList.toggle('is-active', i === heroIndex));
+    }, 6000);
+  }
+
   /* ---- Custom cursor (rAF lerp — zero layout work per mousemove) ---- */
   if (finePointer && !reduceMotion) {
     const dot = $('#cursorDot');
@@ -97,6 +107,15 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -5% 0px' });
   $$('.reveal').forEach((el) => io.observe(el));
+
+  /* ---- Bandeau villes : ne défile que lorsqu'on l'a vraiment atteint ---- */
+  const marqueeTrack = $('#marqueeTrack');
+  if (marqueeTrack && !reduceMotion) {
+    const marqueeIO = new IntersectionObserver((entries) => {
+      entries.forEach((en) => marqueeTrack.classList.toggle('is-running', en.isIntersecting));
+    }, { threshold: 0.5 });
+    marqueeIO.observe(marqueeTrack.closest('.marquee'));
+  }
 
   /* ---- Animated counters ---- */
   const counterIO = new IntersectionObserver((entries) => {
@@ -158,6 +177,9 @@
     };
     captureNaturalSizes();
     if (finePointer) window.addEventListener('resize', captureNaturalSizes, { passive: true });
+    // Référence de taille pour l'agrandissement : sa taille naturelle en cache reste valable
+    // même quand un filtre la masque (is-hidden) — pas besoin qu'elle soit visible à l'écran.
+    const bigTile = tiles.find((t) => t.classList.contains('tile--big'));
 
     const setSpotlight = () => {
       const visible = tiles.filter((t) => !t.classList.contains('is-hidden'));
@@ -173,9 +195,12 @@
       if (visible.length < 2) return;
       spotIndex = ((spotIndex % visible.length) + visible.length) % visible.length;
       const active = visible[spotIndex];
+      // Une tuile pas encore révélée par le scroll (pas de classe is-in) n'a pas encore le
+      // droit d'appliquer le transform de vol (cf. le correctif de spécificité vs .reveal.is-in)
+      // : on la révèle immédiatement pour qu'elle puisse voler au centre quoi qu'il arrive.
+      active.classList.add('is-in');
       if (finePointer) {
-        const refTile = tiles.find((t) => t.classList.contains('tile--big') && !t.classList.contains('is-hidden')) || active;
-        const refNat = naturalSizes.get(refTile);
+        const refNat = naturalSizes.get(bigTile) || naturalSizes.get(active);
         const activeNat = naturalSizes.get(active);
         if (refNat && activeNat) {
           // Mesurer avec une transition active n'est pas fiable : selon les cas, le
@@ -217,21 +242,33 @@
       });
     };
     let galleryInView = false;
+    let enterTimer = null;
     // On reste observé en continu (pas de unobserve) : si l'utilisateur quitte la section
     // (retour en haut, scroll vers une autre section), le spotlight doit s'arrêter et ne
     // reprendre que lorsque la galerie revient réellement à l'écran.
+    // La galerie est bien plus haute que le viewport : un seuil en % de sa hauteur totale
+    // se déclenche dès que son haut pointe en bas de l'écran. On restreint donc la zone de
+    // détection à une fine bande autour du centre du viewport (rootMargin négatif) — il faut
+    // vraiment avoir scrollé jusqu'à la section pour que ça s'active.
     const galleryIO = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
         galleryInView = en.isIntersecting;
+        clearTimeout(enterTimer);
         if (galleryInView) {
-          gallery.classList.add('is-spotlighting');
-          setSpotlight();
-          startSpotlight();
+          // Petit délai avant le premier envol : le temps que le scroll se stabilise,
+          // sinon la première photo peut s'envoler alors qu'on n'est pas encore vraiment
+          // arrêté sur la section (elle atterrit au-dessus, hors cadre).
+          enterTimer = setTimeout(() => {
+            if (!galleryInView) return;
+            gallery.classList.add('is-spotlighting');
+            setSpotlight();
+            startSpotlight();
+          }, 600);
         } else {
           stopSpotlight();
         }
       });
-    }, { threshold: 0.2 });
+    }, { threshold: 0, rootMargin: '-45% 0px -45% 0px' });
     galleryIO.observe(gallery);
     gallery.addEventListener('mouseenter', () => { if (galleryInView) clearInterval(spotTimer); });
     gallery.addEventListener('mouseleave', () => { if (galleryInView) startSpotlight(); });
@@ -259,8 +296,14 @@
     let tIndex = 0, tTimer = null;
     const showSlide = (i) => {
       tIndex = i;
-      slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
-      dots.forEach((d, k) => d.classList.toggle('is-active', k === i));
+      slides.forEach((s, k) => {
+        s.classList.toggle('is-active', k === i);
+        s.setAttribute('aria-hidden', String(k !== i));
+      });
+      dots.forEach((d, k) => {
+        d.classList.toggle('is-active', k === i);
+        d.setAttribute('aria-pressed', String(k === i));
+      });
     };
     const startRotation = () => {
       if (reduceMotion) return;
