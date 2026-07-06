@@ -142,6 +142,23 @@
   let spotTimer = null, resetSpotlight = () => {};
   if (gallery && tiles.length && !reduceMotion) {
     let spotIndex = 0;
+    // Le vol vers le centre + le redimensionnement ne s'activent que sur pointeur précis
+    // (souris) : sur tactile, pas de pause au survol possible, donc on garde uniquement
+    // la mise en lumière douce (bordure + assombrissement) pour ne pas gêner le scroll mobile.
+    let naturalSizes = new Map();
+    const captureNaturalSizes = () => {
+      if (!finePointer) return;
+      tiles.forEach((t) => {
+        const prevW = t.style.width, prevH = t.style.height;
+        t.style.width = ''; t.style.height = '';
+        const r = t.getBoundingClientRect();
+        naturalSizes.set(t, { w: r.width, h: r.height });
+        t.style.width = prevW; t.style.height = prevH;
+      });
+    };
+    captureNaturalSizes();
+    if (finePointer) window.addEventListener('resize', captureNaturalSizes, { passive: true });
+
     const setSpotlight = () => {
       const visible = tiles.filter((t) => !t.classList.contains('is-hidden'));
       if (!visible.length) return;
@@ -149,36 +166,75 @@
         t.classList.remove('is-spotlight');
         t.style.setProperty('--fly-x', '0px');
         t.style.setProperty('--fly-y', '0px');
-        t.style.setProperty('--fly-scale', '1');
+        if (!finePointer) return;
+        const nat = naturalSizes.get(t);
+        if (nat) { t.style.width = `${nat.w}px`; t.style.height = `${nat.h}px`; }
       });
       if (visible.length < 2) return;
       spotIndex = ((spotIndex % visible.length) + visible.length) % visible.length;
       const active = visible[spotIndex];
-      const rect = active.getBoundingClientRect();
-      const dx = window.innerWidth / 2 - (rect.left + rect.width / 2);
-      const dy = window.innerHeight / 2 - (rect.top + rect.height / 2);
-      active.style.setProperty('--fly-x', `${dx}px`);
-      active.style.setProperty('--fly-y', `${dy}px`);
-      active.style.setProperty('--fly-scale', '1.2');
+      if (finePointer) {
+        const refTile = tiles.find((t) => t.classList.contains('tile--big') && !t.classList.contains('is-hidden')) || active;
+        const refNat = naturalSizes.get(refTile);
+        const activeNat = naturalSizes.get(active);
+        if (refNat && activeNat) {
+          // Mesurer avec une transition active n'est pas fiable : selon les cas, le
+          // navigateur peut renvoyer l'ancienne taille juste après le changement. On coupe
+          // donc la transition pour mesurer la position/taille cible de façon instantanée
+          // et exacte, puis on revient à l'état naturel avant de la réactiver — la vraie
+          // animation démarre alors proprement depuis l'état naturel vers la cible.
+          const prevTransition = active.style.transition;
+          active.style.transition = 'none';
+          active.style.width = `${refNat.w}px`;
+          active.style.height = `${refNat.h}px`;
+          const rect = active.getBoundingClientRect();
+          const dx = window.innerWidth / 2 - (rect.left + rect.width / 2);
+          const dy = window.innerHeight / 2 - (rect.top + rect.height / 2);
+          active.style.width = `${activeNat.w}px`;
+          active.style.height = `${activeNat.h}px`;
+          void active.offsetWidth;
+          active.style.transition = prevTransition;
+          active.style.width = `${refNat.w}px`;
+          active.style.height = `${refNat.h}px`;
+          active.style.setProperty('--fly-x', `${dx}px`);
+          active.style.setProperty('--fly-y', `${dy}px`);
+        }
+      }
       active.classList.add('is-spotlight');
     };
     const startSpotlight = () => {
       clearInterval(spotTimer);
       spotTimer = setInterval(() => { spotIndex += 1; setSpotlight(); }, 4500);
     };
-    resetSpotlight = () => { spotIndex = 0; setSpotlight(); startSpotlight(); };
+    resetSpotlight = () => { if (!galleryInView) return; spotIndex = 0; setSpotlight(); startSpotlight(); };
+    const stopSpotlight = () => {
+      clearInterval(spotTimer);
+      gallery.classList.remove('is-spotlighting');
+      tiles.forEach((t) => {
+        t.classList.remove('is-spotlight');
+        t.style.setProperty('--fly-x', '0px');
+        t.style.setProperty('--fly-y', '0px');
+      });
+    };
+    let galleryInView = false;
+    // On reste observé en continu (pas de unobserve) : si l'utilisateur quitte la section
+    // (retour en haut, scroll vers une autre section), le spotlight doit s'arrêter et ne
+    // reprendre que lorsque la galerie revient réellement à l'écran.
     const galleryIO = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        galleryIO.unobserve(en.target);
-        gallery.classList.add('is-spotlighting');
-        setSpotlight();
-        startSpotlight();
+        galleryInView = en.isIntersecting;
+        if (galleryInView) {
+          gallery.classList.add('is-spotlighting');
+          setSpotlight();
+          startSpotlight();
+        } else {
+          stopSpotlight();
+        }
       });
     }, { threshold: 0.2 });
     galleryIO.observe(gallery);
-    gallery.addEventListener('mouseenter', () => clearInterval(spotTimer));
-    gallery.addEventListener('mouseleave', startSpotlight);
+    gallery.addEventListener('mouseenter', () => { if (galleryInView) clearInterval(spotTimer); });
+    gallery.addEventListener('mouseleave', () => { if (galleryInView) startSpotlight(); });
   }
 
   /* ---- Lightbox ---- */
